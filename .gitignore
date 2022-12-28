@@ -1,0 +1,9 @@
+*.log
+*.d
+*.o
+*.pyc
+*.class
+*.tmp
+CMakeLists.txt
+cmake-build-debug*
+.idea*
