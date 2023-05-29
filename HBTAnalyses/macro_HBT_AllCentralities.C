@@ -159,7 +159,7 @@ for(unsigned int i_centbin=0; i_centbin<nCentBins; i_centbin++){
    h_qinv_sig_SS_Corr[i_centbin]->SetLineColor(2);
    h_qinv_sig_SS_Corr[i_centbin]->SetMarkerColor(2);
    gPad->SetLogy(1);
-   c->SaveAs(Form("%s/%s.pdf",folder_name.c_str(),histName_sig_SS[i_centbin].c_str()));
+   c->SaveAs(Form("%s/%s_%s.pdf",folder_name.c_str(),histName_sig_SS[i_centbin].c_str(),histName_sig_SS_Corr[i_centbin].c_str()));
    c->Update();
 
    t_1->Draw(Form("qinvSigOS>>%s",histName_bkg_OS[i_centbin].c_str()),hFsumEtcut[i_centbin],"goff"); //I use "qinvSigOS" but this was not a proper name saved in the tree...should be BkgOS
