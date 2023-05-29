@@ -78,6 +78,10 @@ TFile *output = new TFile(outFileName,"recreate");
 auto treeName = "demo/HBT";
 auto t_1 = f->Get<TTree>(treeName);
 
+///folder to save figures in PDF
+std::string folder_name="figures";
+gSystem->Exec(Form("mkdir %s",folder_name.c_str()));
+
 ///From paper Fig1 of "https://arxiv.org/pdf/1107.4800.pdf" correspondence of HFsumET and Centrality:  
 ///0-5% (centrality)-> 3380-5000GeV (HFSumET), 5-10%->2770-3380GeV, 10-15%-> 2280-2770GeV, 15-20%-> 1850-2280GeV,  20-25%-> 1500-1850GeV,  25-30%-> 1210-1500GeV,  30-35%-> 900-1210GeV,  35-60%-> 240-900GeV,  60-100%->  0.0-240GeV 
 ///When doing the analysis you can merge some of the bins, for example: 10-20% --> 1850-2770GeV (since the mixing was done following this binning)
@@ -127,8 +131,8 @@ TString funcGaussName_sr_SS_Over_OS[nCentBins]={"fGaussSrSSoverOS_0to5","fGaussS
 
 
 ///Canvas will be updated on-the-fly
-//auto c = new TCanvas("c", "c", 500, 500);
-//c->cd();
+auto c = new TCanvas("c", "c", 500, 500);
+c->cd();
 
 //Loop in all centrality bins - do everything: create histos, single ratios and fits
 for(unsigned int i_centbin=0; i_centbin<nCentBins; i_centbin++){
@@ -145,12 +149,18 @@ for(unsigned int i_centbin=0; i_centbin<nCentBins; i_centbin++){
    t_1->Draw(Form("qinvSigSS>>%s",histName_sig_SS[i_centbin].c_str()),hFsumEtcut[i_centbin],"goff");
    func_hist_custom_qinv(h_qinv_sig_SS[i_centbin]);
    h_qinv_sig_SS[i_centbin]->Write();
+   h_qinv_sig_SS[i_centbin]->Draw();
    //c->Update(); 
 
    t_1->Draw(Form("qinvSigSS>>%s",histName_sig_SS_Corr[i_centbin].c_str()),hFsumEtcut_coulombWSS[i_centbin],"goff");
    func_hist_custom_qinv(h_qinv_sig_SS_Corr[i_centbin]);
    h_qinv_sig_SS_Corr[i_centbin]->Write();
-   //c->Update();
+   h_qinv_sig_SS_Corr[i_centbin]->Draw("same");
+   h_qinv_sig_SS_Corr[i_centbin]->SetLineColor(2);
+   h_qinv_sig_SS_Corr[i_centbin]->SetMarkerColor(2);
+   gPad->SetLogy(1);
+   c->SaveAs(Form("%s/%s.pdf",folder_name.c_str(),histName_sig_SS[i_centbin].c_str()));
+   c->Update();
 
    t_1->Draw(Form("qinvSigOS>>%s",histName_bkg_OS[i_centbin].c_str()),hFsumEtcut[i_centbin],"goff"); //I use "qinvSigOS" but this was not a proper name saved in the tree...should be BkgOS
    func_hist_custom_qinv(h_qinv_bkg_OS[i_centbin]);
