@@ -95,35 +95,35 @@ Int_t histNbins=50;
 Float_t histLowerRange=0;
 Float_t histUpperRange=1; //maximum is 1, since saved only till this value in the tree to save space
 
-unsigned int nCentBins =9;
-TString cent_bins[9]={"0-5%","5-10%","10-15%","15-20%","20-25%","25-30%","30-35%","35-60%","60-100%"};
-TCut hFsumEtcut[9]={"HFsumET>3380 && HFsumET<5000","HFsumET>2770 && HFsumET<3380","HFsumET>2280 && HFsumET<2770","HFsumET>1850 && HFsumET<2280","HFsumET>1500 && HFsumET<1850","HFsumET>1210 && HFsumET<1500","HFsumET>900 && HFsumET<1210","HFsumET>240 && HFsumET<900","HFsumET>0 && HFsumET<240"};
-TCut hFsumEtcut_coulombWSS[9]={"coulombWSS*(HFsumET>3380 && HFsumET<5000)","coulombWSS*(HFsumET>2770 && HFsumET<3380)","coulombWSS*(HFsumET>2280 && HFsumET<2770)","coulombWSS*(HFsumET>1850 && HFsumET<2280)","coulombWSS*(HFsumET>1500 && HFsumET<1850)","coulombWSS*(HFsumET>1210 && HFsumET<1500)","coulombWSS*(HFsumET>900 && HFsumET<1210)","coulombWSS*(HFsumET>240 && HFsumET<900)","coulombWSS*(HFsumET>0 && HFsumET<240)"};
-TCut hFsumEtcut_coulombWOS[9]={"coulombWOS*(HFsumET>3380 && HFsumET<5000)","coulombWOS*(HFsumET>2770 && HFsumET<3380)","coulombWOS*(HFsumET>2280 && HFsumET<2770)","coulombWOS*(HFsumET>1850 && HFsumET<2280)","coulombWOS*(HFsumET>1500 && HFsumET<1850)","coulombWOS*(HFsumET>1210 && HFsumET<1500)","coulombWOS*(HFsumET>900 && HFsumET<1210)","coulombWOS*(HFsumET>240 && HFsumET<900)","coulombWOS*(HFsumET>0 && HFsumET<240)"};
+const unsigned int nCentBins =9;
+TH1D * h_qinv_sig_SS[nCentBins];
+TH1D * h_qinv_sig_SS_Corr[nCentBins];
+TH1D * h_qinv_bkg_OS[nCentBins];
+TH1D * h_qinv_bkg_OS_Corr[nCentBins];
+TH1D * h_sr_SS_Over_OS[nCentBins];
+TF1  *f_exp_sr_SS_Over_OS[nCentBins];
+TF1  *f_gauss_sr_SS_Over_OS[nCentBins];
 
-TH1D * h_qinv_sig_SS[9];
-TH1D * h_qinv_sig_SS_Corr[9];
-TH1D * h_qinv_bkg_OS[9];
-TH1D * h_qinv_bkg_OS_Corr[9];
-TH1D * h_sr_SS_Over_OS[9];
-TF1  *f_exp_sr_SS_Over_OS[9]; 
-TF1  *f_gauss_sr_SS_Over_OS[9];
+TString cent_bins[nCentBins]={"0-5%","5-10%","10-15%","15-20%","20-25%","25-30%","30-35%","35-60%","60-100%"};
+TCut hFsumEtcut[nCentBins]={"HFsumET>3380 && HFsumET<5000","HFsumET>2770 && HFsumET<3380","HFsumET>2280 && HFsumET<2770","HFsumET>1850 && HFsumET<2280","HFsumET>1500 && HFsumET<1850","HFsumET>1210 && HFsumET<1500","HFsumET>900 && HFsumET<1210","HFsumET>240 && HFsumET<900","HFsumET>0 && HFsumET<240"};
+TCut hFsumEtcut_coulombWSS[nCentBins]={"coulombWSS*(HFsumET>3380 && HFsumET<5000)","coulombWSS*(HFsumET>2770 && HFsumET<3380)","coulombWSS*(HFsumET>2280 && HFsumET<2770)","coulombWSS*(HFsumET>1850 && HFsumET<2280)","coulombWSS*(HFsumET>1500 && HFsumET<1850)","coulombWSS*(HFsumET>1210 && HFsumET<1500)","coulombWSS*(HFsumET>900 && HFsumET<1210)","coulombWSS*(HFsumET>240 && HFsumET<900)","coulombWSS*(HFsumET>0 && HFsumET<240)"};
+TCut hFsumEtcut_coulombWOS[nCentBins]={"coulombWOS*(HFsumET>3380 && HFsumET<5000)","coulombWOS*(HFsumET>2770 && HFsumET<3380)","coulombWOS*(HFsumET>2280 && HFsumET<2770)","coulombWOS*(HFsumET>1850 && HFsumET<2280)","coulombWOS*(HFsumET>1500 && HFsumET<1850)","coulombWOS*(HFsumET>1210 && HFsumET<1500)","coulombWOS*(HFsumET>900 && HFsumET<1210)","coulombWOS*(HFsumET>240 && HFsumET<900)","coulombWOS*(HFsumET>0 && HFsumET<240)"};
 
-std::string histName_sig_SS[9]={"hqinvSigSS_0to5","hqinvSigSS_5to10","hqinvSigSS_10to15","hqinvSigSS_15to20","hqinvSigSS_20to25","hqinvSigSS_25to30","hqinvSigSS_30to35","hqinvSigSS_35to60","hqinvSigSS_60to100"};
-std::string histName_bkg_OS[9]={"hqinvBkgOS_0to5","hqinvBkgOS_5to10","hqinvBkgOS_10to15","hqinvBkgOS_15to20","hqinvBkgOS_20to25","hqinvBkgOS_25to30","hqinvBkgOS_30to35","hqinvBkgOS_35to60","hqinvBkgOS_60to100"};
-std::string histName_sig_SS_Corr[9]={"hqinvSigSS_Corr_0to5","hqinvSigSS_Corr_5to10","hqinvSigSS_Corr_10to15","hqinvSigSS_Corr_15to20","hqinvSigSS_Corr_20to25","hqinvSigSS_Corr_25to30","hqinvSigSS_Corr_30to35","hqinvSigSS_Corr_35to60","hqinvSigSS_Corr_60to100"};
-std::string histName_bkg_OS_Corr[9]={"hqinvBkgOS_Corr_0to5","hqinvBkgOS_Corr_5to10","hqinvBkgOS_Corr_10to15","hqinvBkgOS_Corr_15to20","hqinvBkgOS_Corr_20to25","hqinvBkgOS_Corr_25to30","hqinvBkgOS_Corr_30to35","hqinvBkgOS_Corr_35to60","hqinvBkgOS_Corr_60to100"};
+std::string histName_sig_SS[nCentBins]={"hqinvSigSS_0to5","hqinvSigSS_5to10","hqinvSigSS_10to15","hqinvSigSS_15to20","hqinvSigSS_20to25","hqinvSigSS_25to30","hqinvSigSS_30to35","hqinvSigSS_35to60","hqinvSigSS_60to100"};
+std::string histName_bkg_OS[nCentBins]={"hqinvBkgOS_0to5","hqinvBkgOS_5to10","hqinvBkgOS_10to15","hqinvBkgOS_15to20","hqinvBkgOS_20to25","hqinvBkgOS_25to30","hqinvBkgOS_30to35","hqinvBkgOS_35to60","hqinvBkgOS_60to100"};
+std::string histName_sig_SS_Corr[nCentBins]={"hqinvSigSS_Corr_0to5","hqinvSigSS_Corr_5to10","hqinvSigSS_Corr_10to15","hqinvSigSS_Corr_15to20","hqinvSigSS_Corr_20to25","hqinvSigSS_Corr_25to30","hqinvSigSS_Corr_30to35","hqinvSigSS_Corr_35to60","hqinvSigSS_Corr_60to100"};
+std::string histName_bkg_OS_Corr[nCentBins]={"hqinvBkgOS_Corr_0to5","hqinvBkgOS_Corr_5to10","hqinvBkgOS_Corr_10to15","hqinvBkgOS_Corr_15to20","hqinvBkgOS_Corr_20to25","hqinvBkgOS_Corr_25to30","hqinvBkgOS_Corr_30to35","hqinvBkgOS_Corr_35to60","hqinvBkgOS_Corr_60to100"};
 
-TString histTitle_sig_SS[9]={"Single ratio SS/OS, 0-5%","Single ratio SS/OS, 5-10%","Single ratio SS/OS, 10-15%","Single ratio SS/OS, 15-20%","Single ratio SS/OS, 20-25%","Single ratio SS/OS, 25-30%","Single ratio SS/OS, 30-35%","Single ratio SS/OS, 35-60%","Single ratio SS/OS, 60-100%"};
-TString histTitle_bkg_OS[9]={"q_{inv} SameEvt OS tracks, 0-5%","q_{inv} SameEvt OS tracks, 5-10%","q_{inv} SameEvt OS tracks, 10-15%","q_{inv} SameEvt OS tracks, 15-20%","q_{inv} SameEvt OS tracks, 20-25%","q_{inv} SameEvt OS tracks, 25-30%","q_{inv} SameEvt OS tracks, 30-35%","q_{inv} SameEvt OS tracks, 35-60%","q_{inv} SameEvt OS tracks, 60-100%"};
-TString histTitle_sig_SS_Corr[9]={"q_{inv} SameEvt SS_Corr tracks, 0-5%","q_{inv} SameEvt SS_Corr tracks, 5-10%","q_{inv} SameEvt SS_Corr tracks, 10-15%","q_{inv} SameEvt SS_Corr tracks, 15-20%","q_{inv} SameEvt SS_Corr tracks, 20-25%","q_{inv} SameEvt SS_Corr tracks, 25-30%","q_{inv} SameEvt SS_Corr tracks, 30-35%","q_{inv} SameEvt SS_Corr tracks, 35-60%","q_{inv} SameEvt SS_Corr tracks, 60-100%"};
-TString histTitle_bkg_OS_Corr[9]={"q_{inv} SameEvt OS_Corr tracks, 0-5%","q_{inv} SameEvt OS_Corr tracks, 5-10%","q_{inv} SameEvt OS_Corr tracks, 10-15%","q_{inv} SameEvt OS_Corr tracks, 15-20%","q_{inv} SameEvt OS_Corr tracks, 20-25%","q_{inv} SameEvt OS_Corr tracks, 25-30%","q_{inv} SameEvt OS_Corr tracks, 30-35%","q_{inv} SameEvt OS_Corr tracks, 35-60%","q_{inv} SameEvt OS_Corr tracks, 60-100%"};
+TString histTitle_sig_SS[nCentBins]={"Single ratio SS/OS, 0-5%","Single ratio SS/OS, 5-10%","Single ratio SS/OS, 10-15%","Single ratio SS/OS, 15-20%","Single ratio SS/OS, 20-25%","Single ratio SS/OS, 25-30%","Single ratio SS/OS, 30-35%","Single ratio SS/OS, 35-60%","Single ratio SS/OS, 60-100%"};
+TString histTitle_bkg_OS[nCentBins]={"q_{inv} SameEvt OS tracks, 0-5%","q_{inv} SameEvt OS tracks, 5-10%","q_{inv} SameEvt OS tracks, 10-15%","q_{inv} SameEvt OS tracks, 15-20%","q_{inv} SameEvt OS tracks, 20-25%","q_{inv} SameEvt OS tracks, 25-30%","q_{inv} SameEvt OS tracks, 30-35%","q_{inv} SameEvt OS tracks, 35-60%","q_{inv} SameEvt OS tracks, 60-100%"};
+TString histTitle_sig_SS_Corr[nCentBins]={"q_{inv} SameEvt SS_Corr tracks, 0-5%","q_{inv} SameEvt SS_Corr tracks, 5-10%","q_{inv} SameEvt SS_Corr tracks, 10-15%","q_{inv} SameEvt SS_Corr tracks, 15-20%","q_{inv} SameEvt SS_Corr tracks, 20-25%","q_{inv} SameEvt SS_Corr tracks, 25-30%","q_{inv} SameEvt SS_Corr tracks, 30-35%","q_{inv} SameEvt SS_Corr tracks, 35-60%","q_{inv} SameEvt SS_Corr tracks, 60-100%"};
+TString histTitle_bkg_OS_Corr[nCentBins]={"q_{inv} SameEvt OS_Corr tracks, 0-5%","q_{inv} SameEvt OS_Corr tracks, 5-10%","q_{inv} SameEvt OS_Corr tracks, 10-15%","q_{inv} SameEvt OS_Corr tracks, 15-20%","q_{inv} SameEvt OS_Corr tracks, 20-25%","q_{inv} SameEvt OS_Corr tracks, 25-30%","q_{inv} SameEvt OS_Corr tracks, 30-35%","q_{inv} SameEvt OS_Corr tracks, 35-60%","q_{inv} SameEvt OS_Corr tracks, 60-100%"};
 
-std::string histName_sr_SS_Over_OS[9]={"hsrSSoverOS_0to5","hsrSSoverOS_5to10","hsrSSoverOS_10to15","hsrSSoverOS_15to20","hsrSSoverOS_20to25","hsrSSoverOS_25to30","hsrSSoverOS_30to35","hsrSSoverOS_35to60","hsrSSoverOS_60to100"};
-TString histTitle_sr_SS_Over_OS[9]={"Single ratio SS/OS, 0-5%","Single ratio SS/OS, 5-10%","Single ratio SS/OS, 10-15%","Single ratio SS/OS, 15-20%","Single ratio SS/OS, 20-25%","Single ratio SS/OS, 25-30%","Single ratio SS/OS, 30-35%","Single ratio SS/OS, 35-60%","Single ratio SS/OS, 60-100%"};
+std::string histName_sr_SS_Over_OS[nCentBins]={"hsrSSoverOS_0to5","hsrSSoverOS_5to10","hsrSSoverOS_10to15","hsrSSoverOS_15to20","hsrSSoverOS_20to25","hsrSSoverOS_25to30","hsrSSoverOS_30to35","hsrSSoverOS_35to60","hsrSSoverOS_60to100"};
+TString histTitle_sr_SS_Over_OS[nCentBins]={"Single ratio SS/OS, 0-5%","Single ratio SS/OS, 5-10%","Single ratio SS/OS, 10-15%","Single ratio SS/OS, 15-20%","Single ratio SS/OS, 20-25%","Single ratio SS/OS, 25-30%","Single ratio SS/OS, 30-35%","Single ratio SS/OS, 35-60%","Single ratio SS/OS, 60-100%"};
 
-TString funcExpName_sr_SS_Over_OS[9]={"fExpSrSSoverOS_0to5","fExpSrSSoverOS_5to10","fExpSrSSoverOS_10to15","fExpSrSSoverOS_15to20","fExpSrSSoverOS_20to25","fExpSrSSoverOS_25to30","fExpSrSSoverOS_30to35","fExpSrSSoverOS_35to60","fExpSrSSoverOS_60to100"};
-TString funcGaussName_sr_SS_Over_OS[9]={"fGaussSrSSoverOS_0to5","fGaussSrSSoverOS_5to10","fGaussSrSSoverOS_10to15","fGaussSrSSoverOS_15to20","fGaussSrSSoverOS_20to25","fGaussSrSSoverOS_25to30","fGaussSrSSoverOS_30to35","fGaussSrSSoverOS_35to60","fGaussSrSSoverOS_60to100"};
+TString funcExpName_sr_SS_Over_OS[nCentBins]={"fExpSrSSoverOS_0to5","fExpSrSSoverOS_5to10","fExpSrSSoverOS_10to15","fExpSrSSoverOS_15to20","fExpSrSSoverOS_20to25","fExpSrSSoverOS_25to30","fExpSrSSoverOS_30to35","fExpSrSSoverOS_35to60","fExpSrSSoverOS_60to100"};
+TString funcGaussName_sr_SS_Over_OS[nCentBins]={"fGaussSrSSoverOS_0to5","fGaussSrSSoverOS_5to10","fGaussSrSSoverOS_10to15","fGaussSrSSoverOS_15to20","fGaussSrSSoverOS_20to25","fGaussSrSSoverOS_25to30","fGaussSrSSoverOS_30to35","fGaussSrSSoverOS_35to60","fGaussSrSSoverOS_60to100"};
 
 
 ///Canvas will be updated on-the-fly
