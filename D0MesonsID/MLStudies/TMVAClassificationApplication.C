@@ -116,18 +116,21 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
     // Create a set of variables and declare them to the reader
     // - the variable names MUST corresponds in name and type to those given in the weight file(s) used
-    Float_t D3DDecayLength, D3DDecayLengthSignificance, DTrk1Chi2n, DTrk1PtErr, DTrk2Chi2n, DVtxProb, D3DPointingAngle, DDca, DTtrk1Pt, DTrk2Pt, DTrk2PtErr, DTrk1Eta, DTrk2Eta, DxyDCASignificanceDaugther1, DxyDCASignificanceDaugther2, DzDCASignificanceDaugther1, DzDCASignificanceDaugther2;
+
+    Float_t D3DDecayLength, D2DPointingAngle, D3DPointingAngle, D3DDecayLengthSignificance,  DTrk1PtErr, DTrk2PtErr, DVtxProb, DTtrk1Pt, DTrk2Pt,  DTrk1Eta, DTrk2Eta, DxyDCASignificanceDaugther1, DxyDCASignificanceDaugther2, DzDCASignificanceDaugther1, DzDCASignificanceDaugther2;
     reader->AddVariable("D3DDecayLength", &D3DDecayLength);
-    reader->AddVariable("D3DDecayLengthSignificance", &D3DDecayLengthSignificance);
-    reader->AddVariable("DTrk1Chi2n", &DTrk1Chi2n);
-    reader->AddVariable("DTrk1PtErr", &DTrk1PtErr);
-    reader->AddVariable("DTrk2Chi2n", &DTrk2Chi2n);
-    reader->AddVariable("DVtxProb", &DVtxProb);
+    reader->AddVariable("D2DPointingAngle", &D2DPointingAngle);
     reader->AddVariable("D3DPointingAngle", &D3DPointingAngle);
-    reader->AddVariable("DDca", &DDca);
+    reader->AddVariable("D3DDecayLengthSignificance", &D3DDecayLengthSignificance);
+    //reader->AddVariable("DTrk1Chi2n", &DTrk1Chi2n);
+    reader->AddVariable("DTrk1PtErr", &DTrk1PtErr);
+    reader->AddVariable("DTrk2PtErr", &DTrk2PtErr);
+    //reader->AddVariable("DTrk2Chi2n", &DTrk2Chi2n);
+    reader->AddVariable("DVtxProb", &DVtxProb);
+    
+    //reader->AddVariable("DDca", &DDca);
     reader->AddVariable("DTtrk1Pt", &DTtrk1Pt);
     reader->AddVariable("DTrk2Pt", &DTrk2Pt);
-    reader->AddVariable("DTrk2PtErr", &DTrk2PtErr);
     reader->AddVariable("DTrk1Eta", &DTrk1Eta);
     reader->AddVariable("DTrk2Eta", &DTrk2Eta);
     reader->AddVariable("DxyDCASignificanceDaugther1", &DxyDCASignificanceDaugther1);
@@ -137,7 +140,9 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
     // Book the MVA methods
     ///TString dir    = "/home/allanfgodoi/Desktop/";
-    TString dir    = "/Users/cesarbernardes/Dropbox/Ubuntu_1204/AltasEnergias/ProfessorUFRGS/OrientacaoDeAlunos/IC_TCC/ReposGit/IC-HIN-UFRGS/D0MesonsID/MLStudies/";
+
+    TString dir    = "/home/guilherme/testes/TCC-HIN-UFRGS/D0MesonsID/MLStudies/dataset_15/weights/";
+
     TString prefix = "TMVAClassification";
 
     // Book method(s)
@@ -160,7 +165,9 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     //
     TFile *input(0);
     //TString fname = "/home/allanfgodoi/Desktop/tree_skim_MC_promptTest.root";
-    TString fname = "/Users/cesarbernardes/Dropbox/Ubuntu_1204/AltasEnergias/ProfessorUFRGS/OrientacaoDeAlunos/IC_TCC/TopicosDeEstudo/D0_Selection/D0_MC_SkimmedTrees/tree_skim_MC_prompt.root";
+
+    TString fname = "/home/guilherme/testes/TCC-HIN-UFRGS/D0MesonsID/MLStudies/treeMCprompt.root";
+
     if (!gSystem->AccessPathName( fname ))
         input = TFile::Open( fname ); // check if file in local directory exists
     else
@@ -179,14 +186,19 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     //
     std::cout << "--- Select signal+background sample" << std::endl;
     TTree* theTree = (TTree*)input->Get("Dfinder/ntDkpi");
-    std::vector<float> * vec_D3DDecayLength = 0; 
+
+    std::vector<float> * vec_D3DDecayLength = 0;
+    std::vector<float> * vec_D2DPointingAngle = 0;
+    std::vector<float> * vec_D3DPointingAngle = 0; 
     std::vector<float> * vec_D3DDecayLengthSignificance = 0;
-    std::vector<float> * vec_DTrk1Chi2n = 0;
+    
+    
+    //std::vector<float> * vec_DTrk1Chi2n = 0;
     std::vector<float> * vec_DTrk1PtErr = 0;
-    std::vector<float> * vec_DTrk2Chi2n = 0;
+    //std::vector<float> * vec_DTrk2Chi2n = 0;
     std::vector<float> * vec_DVtxProb = 0;
-    std::vector<float> * vec_D3DPointingAngle = 0;
-    std::vector<float> * vec_DDca = 0;
+    
+    //std::vector<float> * vec_DDca = 0;
     std::vector<float> * vec_DTtrk1Pt = 0;
     std::vector<float> * vec_DTrk2Pt = 0;
     std::vector<float> * vec_DTrk2PtErr = 0;
@@ -198,23 +210,24 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     std::vector<float> * vec_DzDCASignificanceDaugther2 = 0;
     //std::vector<float> * vec_DMass = 0;
     theTree->SetBranchAddress("D3DDecayLength", &vec_D3DDecayLength);
-    theTree->SetBranchAddress("D3DDecayLengthSignificance", &vec_D3DDecayLengthSignificance);
-    theTree->SetBranchAddress("DTrk1Chi2n", &vec_DTrk1Chi2n);
-    theTree->SetBranchAddress("DTrk1PtErr", &vec_DTrk1PtErr);
-    theTree->SetBranchAddress("DTrk2Chi2n", &vec_DTrk2Chi2n);
-    theTree->SetBranchAddress("DVtxProb", &vec_DVtxProb);
+
+    theTree->SetBranchAddress("D2DPointingAngle", &vec_D2DPointingAngle);
     theTree->SetBranchAddress("D3DPointingAngle", &vec_D3DPointingAngle);
-    theTree->SetBranchAddress("DDca", &vec_DDca);
+    theTree->SetBranchAddress("D3DDecayLengthSignificance", &vec_D3DDecayLengthSignificance);
+    theTree->SetBranchAddress("DTrk1PtErr", &vec_DTrk1PtErr);
+    theTree->SetBranchAddress("DTrk2PtErr", &vec_DTrk2PtErr);
+    theTree->SetBranchAddress("DVtxProb", &vec_DVtxProb);
     theTree->SetBranchAddress("DTtrk1Pt", &vec_DTtrk1Pt);
     theTree->SetBranchAddress("DTrk2Pt", &vec_DTrk2Pt);
-    theTree->SetBranchAddress("DTrk2PtErr", &vec_DTrk2PtErr);
     theTree->SetBranchAddress("DTrk1Eta", &vec_DTrk1Eta);
     theTree->SetBranchAddress("DTrk2Eta", &vec_DTrk2Eta);
     theTree->SetBranchAddress("DxyDCASignificanceDaugther1", &vec_DxyDCASignificanceDaugther1);
     theTree->SetBranchAddress("DxyDCASignificanceDaugther2", &vec_DxyDCASignificanceDaugther2);
     theTree->SetBranchAddress("DzDCASignificanceDaugther1", &vec_DzDCASignificanceDaugther1);
     theTree->SetBranchAddress("DzDCASignificanceDaugther2", &vec_DzDCASignificanceDaugther2);
+
     //theTree->SetBranchAddress("DMass", &vec_DMass);
+
 
     std::cout << "--- Processing: " << theTree->GetEntries() << " events" << std::endl;
     TStopwatch sw;
@@ -230,24 +243,25 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 	//this is a loop in the D0 meson candidates in a given event
 	//NB.: here it can include signal and background 
         for(int iD0=0; iD0<vec_D3DDecayLength->size(); iD0++){
-           //use same sequence of variables as in the weight file        
-           aux_vec_all_trainingVariables.push_back((*vec_D3DDecayLength)[iD0]); 
-	   aux_vec_all_trainingVariables.push_back((*vec_D3DDecayLengthSignificance)[iD0]);
-	   aux_vec_all_trainingVariables.push_back((*vec_DTrk1Chi2n)[iD0]);
-	   aux_vec_all_trainingVariables.push_back((*vec_DTrk1PtErr)[iD0]);
-	   aux_vec_all_trainingVariables.push_back((*vec_DTrk2Chi2n)[iD0]);
-	   aux_vec_all_trainingVariables.push_back((*vec_DVtxProb)[iD0]);
-	   aux_vec_all_trainingVariables.push_back((*vec_D3DPointingAngle)[iD0]);
-	   aux_vec_all_trainingVariables.push_back((*vec_DDca)[iD0]);
-           aux_vec_all_trainingVariables.push_back((*vec_DTtrk1Pt)[iD0]);
-           aux_vec_all_trainingVariables.push_back((*vec_DTrk2Pt)[iD0]);
-           aux_vec_all_trainingVariables.push_back((*vec_DTrk2PtErr)[iD0]);
-           aux_vec_all_trainingVariables.push_back((*vec_DTrk1Eta)[iD0]);
-           aux_vec_all_trainingVariables.push_back((*vec_DTrk2Eta)[iD0]);
-	   aux_vec_all_trainingVariables.push_back((*vec_DxyDCASignificanceDaugther1)[iD0]);
-           aux_vec_all_trainingVariables.push_back((*vec_DxyDCASignificanceDaugther2)[iD0]);
-           aux_vec_all_trainingVariables.push_back((*vec_DzDCASignificanceDaugther1)[iD0]);
-           aux_vec_all_trainingVariables.push_back((*vec_DzDCASignificanceDaugther2)[iD0]);
+
+           //use same sequence of variables as in the weight file
+           
+           if (!TMath::IsNaN((*vec_D3DDecayLength)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_D3DDecayLength)[iD0]);
+           if (!TMath::IsNaN((*vec_D2DPointingAngle)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_D2DPointingAngle)[iD0]);
+           if (!TMath::IsNaN((*vec_D3DPointingAngle)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_D3DPointingAngle)[iD0]);
+           if (!TMath::IsNaN((*vec_D3DDecayLengthSignificance)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_D3DDecayLengthSignificance)[iD0]);
+           if (!TMath::IsNaN((*vec_DTrk1PtErr)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DTrk1PtErr)[iD0]);
+           if (!TMath::IsNaN((*vec_DTrk2PtErr)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DTrk2PtErr)[iD0]);
+           if (!TMath::IsNaN((*vec_DVtxProb)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DVtxProb)[iD0]);
+           if (!TMath::IsNaN((*vec_DTtrk1Pt)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DTtrk1Pt)[iD0]);
+           if (!TMath::IsNaN((*vec_DTrk2Pt)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DTrk2Pt)[iD0]);
+           if (!TMath::IsNaN((*vec_DTrk1Eta)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DTrk1Eta)[iD0]);
+           if (!TMath::IsNaN((*vec_DTrk2Eta)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DTrk2Eta)[iD0]);
+           if (!TMath::IsNaN((*vec_DxyDCASignificanceDaugther1)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DxyDCASignificanceDaugther1)[iD0]);
+           if (!TMath::IsNaN((*vec_DxyDCASignificanceDaugther2)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DxyDCASignificanceDaugther2)[iD0]);
+           if (!TMath::IsNaN((*vec_DzDCASignificanceDaugther1)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DzDCASignificanceDaugther1)[iD0]);
+           if (!TMath::IsNaN((*vec_DzDCASignificanceDaugther2)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DzDCASignificanceDaugther2)[iD0]);
+
            // Return the MVA outputs and fill into histograms
 	   // See method here: https://root.cern.ch/root/html608/Reader_8cxx_source.html#l00486
            if (Use["BDT"]) histBdt->Fill(reader->EvaluateMVA(aux_vec_all_trainingVariables,"BDT method"));
