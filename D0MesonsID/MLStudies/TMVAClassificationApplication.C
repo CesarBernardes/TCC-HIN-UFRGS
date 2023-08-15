@@ -116,6 +116,7 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
     // Create a set of variables and declare them to the reader
     // - the variable names MUST corresponds in name and type to those given in the weight file(s) used
+
     Float_t D3DDecayLength, D2DPointingAngle, D3DPointingAngle, D3DDecayLengthSignificance,  DTrk1PtErr, DTrk2PtErr, DVtxProb, DTtrk1Pt, DTrk2Pt,  DTrk1Eta, DTrk2Eta, DxyDCASignificanceDaugther1, DxyDCASignificanceDaugther2, DzDCASignificanceDaugther1, DzDCASignificanceDaugther2;
     reader->AddVariable("D3DDecayLength", &D3DDecayLength);
     reader->AddVariable("D2DPointingAngle", &D2DPointingAngle);
@@ -130,7 +131,6 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     //reader->AddVariable("DDca", &DDca);
     reader->AddVariable("DTtrk1Pt", &DTtrk1Pt);
     reader->AddVariable("DTrk2Pt", &DTrk2Pt);
-    
     reader->AddVariable("DTrk1Eta", &DTrk1Eta);
     reader->AddVariable("DTrk2Eta", &DTrk2Eta);
     reader->AddVariable("DxyDCASignificanceDaugther1", &DxyDCASignificanceDaugther1);
@@ -140,7 +140,10 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 
     // Book the MVA methods
     ///TString dir    = "/home/allanfgodoi/Desktop/";
+
     TString dir    = "/home/guilherme/testes/TCC-HIN-UFRGS/D0MesonsID/MLStudies/dataset_15/weights/";
+    //TString dir    = "/Users/cesarbernardes/Dropbox/Ubuntu_1204/AltasEnergias/ProfessorUFRGS/OrientacaoDeAlunos/IC_TCC/ReposGit/TCC-HIN-UFRGS/D0MesonsID/MLStudies/";
+
     TString prefix = "TMVAClassification";
 
     // Book method(s)
@@ -155,7 +158,17 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     // Book output histograms
     UInt_t nbin = 100;
     TH1F *histBdt(0);
-    if (Use["BDT"])           histBdt     = new TH1F( "MVA_BDT",           "MVA_BDT",           nbin, -0.8, 0.8 );
+    TH1F *histBdt_signal(0);
+    TH1F *histBdt_background(0);
+    TH1F *histDMass(0);
+    TH1F *histDMass_SignalLike(0);
+    if (Use["BDT"]){           
+	    histBdt     = new TH1F( "MVA_BDT",           "MVA_BDT",           nbin, -0.44, 0.20 );
+	    histBdt_signal     = new TH1F( "MVA_BDT_signal",           "MVA_BDT_signal",           nbin, -0.44, 0.20 );
+	    histBdt_background     = new TH1F( "MVA_BDT_background",           "MVA_BDT_background",           nbin, -0.44, 0.20 );
+	    histDMass = new TH1F( "D0_Mass",           "D0_Mass",           nbin, 1.62, 2.1 );
+	    histDMass_SignalLike = new TH1F( "D0_Mass_SignalLike",           "D0_Mass_SignalLike",           nbin, 1.62, 2.1 );
+    }
 
     // Prepare input tree (this must be replaced by your data source)
     // in this example, there is a toy tree with signal and one with background events
@@ -163,7 +176,10 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     //
     TFile *input(0);
     //TString fname = "/home/allanfgodoi/Desktop/tree_skim_MC_promptTest.root";
+
     TString fname = "/home/guilherme/testes/TCC-HIN-UFRGS/D0MesonsID/MLStudies/treeMCprompt.root";
+    //TString fname = "/Users/cesarbernardes/Dropbox/Ubuntu_1204/AltasEnergias/ProfessorUFRGS/OrientacaoDeAlunos/IC_TCC/TopicosDeEstudo/D0_Selection/D0_MC_SkimmedTrees/tree_skim_MC_prompt.root";
+
     if (!gSystem->AccessPathName( fname ))
         input = TFile::Open( fname ); // check if file in local directory exists
     else
@@ -182,18 +198,13 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     //
     std::cout << "--- Select signal+background sample" << std::endl;
     TTree* theTree = (TTree*)input->Get("Dfinder/ntDkpi");
+
     std::vector<float> * vec_D3DDecayLength = 0;
     std::vector<float> * vec_D2DPointingAngle = 0;
     std::vector<float> * vec_D3DPointingAngle = 0; 
     std::vector<float> * vec_D3DDecayLengthSignificance = 0;
-    
-    
-    //std::vector<float> * vec_DTrk1Chi2n = 0;
     std::vector<float> * vec_DTrk1PtErr = 0;
-    //std::vector<float> * vec_DTrk2Chi2n = 0;
     std::vector<float> * vec_DVtxProb = 0;
-    
-    //std::vector<float> * vec_DDca = 0;
     std::vector<float> * vec_DTtrk1Pt = 0;
     std::vector<float> * vec_DTrk2Pt = 0;
     std::vector<float> * vec_DTrk2PtErr = 0;
@@ -203,7 +214,7 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     std::vector<float> * vec_DxyDCASignificanceDaugther2 = 0;
     std::vector<float> * vec_DzDCASignificanceDaugther1 = 0;
     std::vector<float> * vec_DzDCASignificanceDaugther2 = 0;
-    //std::vector<float> * vec_DMass = 0;
+
     theTree->SetBranchAddress("D3DDecayLength", &vec_D3DDecayLength);
     theTree->SetBranchAddress("D2DPointingAngle", &vec_D2DPointingAngle);
     theTree->SetBranchAddress("D3DPointingAngle", &vec_D3DPointingAngle);
@@ -220,6 +231,10 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     theTree->SetBranchAddress("DzDCASignificanceDaugther1", &vec_DzDCASignificanceDaugther1);
     theTree->SetBranchAddress("DzDCASignificanceDaugther2", &vec_DzDCASignificanceDaugther2);
 
+    std::vector<float> * vec_DMass = 0;
+    theTree->SetBranchAddress("DMass", &vec_DMass);
+    std::vector<float> * vec_DGen = 0;
+    theTree->SetBranchAddress("DGen", &vec_DGen);
 
     std::cout << "--- Processing: " << theTree->GetEntries() << " events" << std::endl;
     TStopwatch sw;
@@ -235,6 +250,7 @@ void TMVAClassificationApplication( TString myMethodList = "" )
 	//this is a loop in the D0 meson candidates in a given event
 	//NB.: here it can include signal and background 
         for(int iD0=0; iD0<vec_D3DDecayLength->size(); iD0++){
+
            //use same sequence of variables as in the weight file
            
            if (!TMath::IsNaN((*vec_D3DDecayLength)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_D3DDecayLength)[iD0]);
@@ -253,14 +269,22 @@ void TMVAClassificationApplication( TString myMethodList = "" )
            if (!TMath::IsNaN((*vec_DzDCASignificanceDaugther1)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DzDCASignificanceDaugther1)[iD0]);
            if (!TMath::IsNaN((*vec_DzDCASignificanceDaugther2)[iD0])) aux_vec_all_trainingVariables.push_back((*vec_DzDCASignificanceDaugther2)[iD0]);
 
-           
-	   
-           
-           
-           
            // Return the MVA outputs and fill into histograms
 	   // See method here: https://root.cern.ch/root/html608/Reader_8cxx_source.html#l00486
-           if (Use["BDT"]) histBdt->Fill(reader->EvaluateMVA(aux_vec_all_trainingVariables,"BDT method"));
+           if (Use["BDT"]) {
+		   histBdt->Fill(reader->EvaluateMVA(aux_vec_all_trainingVariables,"BDT method"));
+		   if ((*vec_DGen)[iD0]==23333 || (*vec_DGen)[iD0]==23344){
+			 histBdt_signal->Fill(reader->EvaluateMVA(aux_vec_all_trainingVariables,"BDT method"));   
+		   }
+		   if ((*vec_DGen)[iD0]!=23333 && (*vec_DGen)[iD0]!=23344){
+			 histBdt_background->Fill(reader->EvaluateMVA(aux_vec_all_trainingVariables,"BDT method"));  
+		   }
+		   if (!TMath::IsNaN((*vec_DMass)[iD0])){
+			histDMass->Fill((*vec_DMass)[iD0]);   
+			float bdt = reader->EvaluateMVA(aux_vec_all_trainingVariables,"BDT method");
+			if(bdt>0.0) histDMass_SignalLike->Fill((*vec_DMass)[iD0]);
+		   }
+	   }
            aux_vec_all_trainingVariables.clear(); //clean up the vector to fill next D0 meson information					  
 	} 
     }
@@ -271,7 +295,13 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     
     // Write histograms
     TFile *target  = new TFile( "TMVApp.root","RECREATE" );
-    if (Use["BDT"          ])   histBdt    ->Write();
+    if (Use["BDT"          ]){   
+	    histBdt    ->Write();
+	    histBdt_signal   ->Write();
+            histBdt_background  ->Write();
+	    histDMass ->Write();
+	    histDMass_SignalLike->Write();
+    }
       
     target->Close();
     std::cout << "--- Created root file: \"TMVApp.root\" containing the MVA output histograms" << std::endl;
