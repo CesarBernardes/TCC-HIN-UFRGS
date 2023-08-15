@@ -2,7 +2,8 @@
 #include <iostream>
 #include <map>
 #include <string>
- 
+#include <bits/stdc++.h>
+#include "TMath.h"
 #include "TChain.h"
 #include "TFile.h"
 #include "TTree.h"
@@ -17,9 +18,27 @@
 #include "TMVA/Tools.h"
 #include "TMVA/TMVAGui.h"
 
+// Function to measure the time elapsed
+
+void timer()
+{
+    for (int i=0; i<10; i++)
+    {
+    }
+}
 
 int TMVAClassification_01( TString myMethodList = "" )
 {
+
+   // Starting the timer
+
+   time_t start, end;
+
+    time(&start);
+    ios_base::sync_with_stdio(false);
+    timer();
+
+    std::cout << "Timer started." << endl;
    // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
    // if you use your private .rootrc, or run from a different directory, please copy the
    // corresponding lines from .rootrc
@@ -29,6 +48,10 @@ int TMVAClassification_01( TString myMethodList = "" )
    //     mylinux~> root -l TMVAClassification_01.C\(\"myMethod1,myMethod2,myMethod3\"\)
  
    //---------------------------------------------------------------
+      // Enables multi-threading funcionality
+   ROOT::EnableImplicitMT();
+   
+   
    // This loads the library
    TMVA::Tools::Instance();
 
@@ -132,7 +155,7 @@ int TMVAClassification_01( TString myMethodList = "" )
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
    TFile *input(0);
-   TString fname = "/PathToRootFile/tree_skim_MC_prompt.root";
+   TString fname = "/home/guilherme/testes/TCC-HIN-UFRGS/D0MesonsID/MLStudies/treeMCtest.root";
    if (!gSystem->AccessPathName( fname )) {
       input = TFile::Open( fname ); // check if file in local directory exists
    }
@@ -167,7 +190,7 @@ int TMVAClassification_01( TString myMethodList = "" )
    TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification", outputFile,
                                                "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
  
-   TMVA::DataLoader *dataloader=new TMVA::DataLoader("dataset_01");
+   TMVA::DataLoader *dataloader=new TMVA::DataLoader("dataset_15");
    // If you wish to modify default settings
    // (please check "src/Config.h" to see all available global options)
    //
@@ -183,8 +206,28 @@ int TMVAClassification_01( TString myMethodList = "" )
 ////   dataloader->AddVariable( "var4",                "Variable 4", "units", 'F' );
 
    dataloader->AddVariable( "D3DDecayLength", 'F' );
-   dataloader->AddVariable( "DVtxProb", 'F' );
    dataloader->AddVariable( "D2DPointingAngle", 'F' );
+   //dataloader->AddVariable( "D2DDecayLength", 'F' );
+   dataloader->AddVariable( "D3DPointingAngle", 'F' );
+   dataloader->AddVariable( "D3DDecayLengthSignificance", 'F' );
+   //dataloader->AddVariable( "D2DDecayLengthSignificance", 'F' );
+   //dataloader->AddVariable( "DTrk1Chi2n", 'F' );
+   //dataloader->AddVariable( "DTrk2Chi2n", 'F' );
+   dataloader->AddVariable( "DTrk1PtErr", 'F' );
+   dataloader->AddVariable( "DTrk2PtErr", 'F' );
+   dataloader->AddVariable( "DVtxProb", 'F' );
+   //dataloader->AddVariable( "DDca", 'F' );
+   dataloader->AddVariable( "DTtrk1Pt", 'F' );
+   dataloader->AddVariable( "DTrk2Pt", 'F' );
+   dataloader->AddVariable( "DTrk1Eta", 'F' );
+   dataloader->AddVariable( "DTrk2Eta", 'F' );
+   dataloader->AddVariable( "DxyDCASignificanceDaugther1", 'F' );
+   dataloader->AddVariable( "DxyDCASignificanceDaugther2", 'F' );
+   dataloader->AddVariable( "DzDCASignificanceDaugther1", 'F' );
+   dataloader->AddVariable( "DzDCASignificanceDaugther2", 'F' );
+   
+
+   
 
    // You can add so-called "Spectator variables", which are not used in the MVA training,
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
@@ -248,8 +291,14 @@ int TMVAClassification_01( TString myMethodList = "" )
 ////   dataloader->SetBackgroundWeightExpression( "weight" );
  
    // Apply additional cuts on the signal and background samples (can be different)
-   TCut mycuts = "DGen==23333 || DGen==23344"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
-   TCut mycutb = "DGen!=23333 && DGen!=23344"; // for example: TCut mycutb = "abs(var1)<0.5";
+   TCut dgencuts = "DGen==23333 || DGen==23344";
+   TCut dgencutb = "DGen!=23333 && DGen!=23344";
+   TCut d3ddlsrange = "!TMath::IsNaN(D3DDecayLengthSignificance)";
+   TCut dxydcasd2range = "!TMath::IsNaN(DxyDCASignificanceDaugther2)";
+   TCut dzdcasd2range = "!TMath::IsNaN(DzDCASignificanceDaugther2)";
+
+   TCut mycuts = dgencuts && d3ddlsrange && dxydcasd2range && dzdcasd2range; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+   TCut mycutb = dgencutb && d3ddlsrange && dxydcasd2range && dzdcasd2range; // for example: TCut mycutb = "abs(var1)<0.5";
  
    // Tell the dataloader how to use the training and testing events
    //
@@ -510,6 +559,15 @@ int TMVAClassification_01( TString myMethodList = "" )
    delete dataloader;
    // Launch the GUI for the root macros
    if (!gROOT->IsBatch()) TMVA::TMVAGui( outfileName );
+   
+      // Ending the timer and printing the elapsed timer
+
+    time(&end);
+
+    double time_taken = double(end - start);
+    cout << "Time taken by program is : " << fixed
+         << time_taken << setprecision(5);
+    cout << " sec " << endl;
 
    return 0;
 }
