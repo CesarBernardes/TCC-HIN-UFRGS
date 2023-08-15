@@ -141,8 +141,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     // Book the MVA methods
     ///TString dir    = "/home/allanfgodoi/Desktop/";
 
-    //TString dir    = "/home/guilherme/testes/TCC-HIN-UFRGS/D0MesonsID/MLStudies/dataset_15/weights/";
-    TString dir    = "/Users/cesarbernardes/Dropbox/Ubuntu_1204/AltasEnergias/ProfessorUFRGS/OrientacaoDeAlunos/IC_TCC/ReposGit/TCC-HIN-UFRGS/D0MesonsID/MLStudies/";
+    TString dir    = "/home/guilherme/testes/TCC-HIN-UFRGS/D0MesonsID/MLStudies/dataset_15/weights/";
+    //TString dir    = "/Users/cesarbernardes/Dropbox/Ubuntu_1204/AltasEnergias/ProfessorUFRGS/OrientacaoDeAlunos/IC_TCC/ReposGit/TCC-HIN-UFRGS/D0MesonsID/MLStudies/";
 
     TString prefix = "TMVAClassification";
 
@@ -177,8 +177,8 @@ void TMVAClassificationApplication( TString myMethodList = "" )
     TFile *input(0);
     //TString fname = "/home/allanfgodoi/Desktop/tree_skim_MC_promptTest.root";
 
-    //TString fname = "/home/guilherme/testes/TCC-HIN-UFRGS/D0MesonsID/MLStudies/treeMCprompt.root";
-    TString fname = "/Users/cesarbernardes/Dropbox/Ubuntu_1204/AltasEnergias/ProfessorUFRGS/OrientacaoDeAlunos/IC_TCC/TopicosDeEstudo/D0_Selection/D0_MC_SkimmedTrees/tree_skim_MC_prompt.root";
+    TString fname = "/home/guilherme/testes/TCC-HIN-UFRGS/D0MesonsID/MLStudies/treeMCprompt.root";
+    //TString fname = "/Users/cesarbernardes/Dropbox/Ubuntu_1204/AltasEnergias/ProfessorUFRGS/OrientacaoDeAlunos/IC_TCC/TopicosDeEstudo/D0_Selection/D0_MC_SkimmedTrees/tree_skim_MC_prompt.root";
 
     if (!gSystem->AccessPathName( fname ))
         input = TFile::Open( fname ); // check if file in local directory exists
